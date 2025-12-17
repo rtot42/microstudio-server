@@ -9992,17 +9992,33 @@ for (const prop in this) {
   global[prop] = this[prop] ;
 }
 
+var fs = require("fs") ;
 var fs = require("fs");
+
 fs.readFile("./config.json", (err, data) => {
+  // 1. Prioridad máxima: El puerto que asigne Render (process.env.PORT)
+  // 2. Prioridad media: El puerto de config.json
+  // 3. Prioridad baja: Puerto 3000 por defecto
+  
   let defaultPort = 3000;
+  
   if (!err) {
+    console.info("config.json loaded");
     try {
       var config = JSON.parse(data);
       if (config.port) defaultPort = config.port;
-    } catch (e) {}
+    } catch (parseErr) {
+      console.info("could not parse config file, using default");
+    }
+  } else {
+    console.info("config.json not found or could not be read, using default");
   }
-  // ESTO ES LO QUE NECESITA RENDER
+
+  // ESTA ES LA LÍNEA CLAVE PARA RENDER:
   global.server_port = process.env.PORT || defaultPort;
+
   console.info("starting with port set to: " + global.server_port);
-  start();
+  
+  // Llamamos a la función start que ya tienes definida en tu server.js
+  start(); 
 });
