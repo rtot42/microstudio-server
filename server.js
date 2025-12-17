@@ -9992,20 +9992,17 @@ for (const prop in this) {
   global[prop] = this[prop] ;
 }
 
-var fs = require("fs") ;
-fs.readFile("./config.json",(err,data)=> {
-  global.server_port = 3000 ;
-  if (! err) {
-    console.info("config.json loaded") ;
+var fs = require("fs");
+fs.readFile("./config.json", (err, data) => {
+  let defaultPort = 3000;
+  if (!err) {
     try {
-      var config = JSON.parse(data) ;
-      global.server_port = config.port || 3000 ;
-    } catch (err) {
-      console.info("could not parse config file") ;
-    }
-  } else {
-    console.info("could not read config file") ;
+      var config = JSON.parse(data);
+      if (config.port) defaultPort = config.port;
+    } catch (e) {}
   }
-  console.info( "starting with port set to: "+global.server_port ) ;
-  start() ;
-}) ;
+  // ESTO ES LO QUE NECESITA RENDER
+  global.server_port = process.env.PORT || defaultPort;
+  console.info("starting with port set to: " + global.server_port);
+  start();
+});
